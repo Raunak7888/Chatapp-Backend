@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll() // Public endpoints for authentication
                         .requestMatchers("/chat/**").permitAll() // WebSocket endpoints
+
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers

@@ -13,11 +13,9 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final JwtService jwtService;
     private final JwtChannelInterceptor jwtChannelInterceptor;
 
     public WebSocketConfig(JwtService jwtService, JwtChannelInterceptor jwtChannelInterceptor) {
-        this.jwtService = jwtService;
         this.jwtChannelInterceptor = jwtChannelInterceptor;
     }
 

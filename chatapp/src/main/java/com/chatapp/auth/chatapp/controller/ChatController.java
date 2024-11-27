@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -16,19 +17,19 @@ public class ChatController {
 
     private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
     private final MessageService messageService;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public ChatController(MessageService messageService, GetUserDataService getUserDataService) {
+    public ChatController(MessageService messageService, GetUserDataService getUserDataService, SimpMessagingTemplate messagingTemplate) {
         this.messageService = messageService;
+        this.messagingTemplate = messagingTemplate;
     }
 
     /**
      * Handles sending of a private message.
      * @param messageDTO DTO containing message content and sender information.
-     * @return MessageDTO representing the saved message.
      */
     @MessageMapping("/send/message")
-    @SendTo("/topic/messages")
-    public MessageDTO sendMessage(MessageDTO messageDTO) {
+    public void sendMessage(MessageDTO messageDTO) {
         // Log incoming message content and receiver ID for tracking
         logger.info("Received message: '{}' from sender ID: {} to receiver ID: {}", messageDTO.getContent(), messageDTO.getSenderId(), messageDTO.getReceiverId());
 
@@ -39,8 +40,9 @@ public class ChatController {
             // Log the saved message content
             logger.info("Message successfully saved: {}", savedMessage.getContent());
 
-            // Convert and return the saved message as a DTO
-            return convertToDTO(savedMessage);
+            String destination = "/topic/user/" + messageDTO.getReceiverId() + "/queue/private";
+            System.out.println(destination);
+            messagingTemplate.convertAndSend(destination, convertToDTO(savedMessage));
         } catch (Exception e) {
             logger.error("Error saving message: {}", e.getMessage());
             throw new RuntimeException("Message could not be saved due to an error.");
@@ -67,4 +69,6 @@ public class ChatController {
 
         return dto;
     }
+
+
 }

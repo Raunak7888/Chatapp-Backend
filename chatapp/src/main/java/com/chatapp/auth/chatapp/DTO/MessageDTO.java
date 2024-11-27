@@ -26,7 +26,7 @@ public class MessageDTO {
     @NotNull(message = "Sender ID cannot be null")
     private Long senderId;
 
+
     private Long receiverId;  // For one-to-one messages
 
-    private Long groupChatId; // For group messages
 }
