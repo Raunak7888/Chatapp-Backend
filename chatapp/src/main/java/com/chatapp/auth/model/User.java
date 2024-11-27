@@ -53,6 +53,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "senderId")
     private Set<Message> messages = new HashSet<>();
 
+    @ManyToMany(mappedBy = "members")
+    private Set<GroupDetails> groups = new HashSet<>();
+
 //    @ManyToMany
 //    @JoinTable(name = "group_chat_users",
 //            joinColumns = @JoinColumn(name = "user_id"),

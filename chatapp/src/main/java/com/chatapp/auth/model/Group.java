@@ -1,16 +1,18 @@
 package com.chatapp.auth.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "Group_Chats")
+@Table(name = "Group_Chats") // Table for messages
 public class Group {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,14 +24,16 @@ public class Group {
     private LocalDateTime timestamp;
 
     @Column(name = "sender_id", nullable = false)
-    private Long senderId; // Stores the sender's ID
+    private Long senderId; // ID of the message sender
 
-    @Column(name = "Group_id", nullable = false)
-    private Long GroupId;
+    @ManyToOne
+    @JoinColumn(name = "group_id", nullable = false) // Foreign key to Groups table
+    private GroupDetails groupId; // Reference to the group
 
-    public Group(String content, Long groupId, Long senderId) {
+    public Group(String content, GroupDetails groupId, Long senderId) {
         this.content = content;
-        GroupId = groupId;
+        this.groupId = groupId;
         this.senderId = senderId;
+        this.timestamp = LocalDateTime.now();
     }
 }
