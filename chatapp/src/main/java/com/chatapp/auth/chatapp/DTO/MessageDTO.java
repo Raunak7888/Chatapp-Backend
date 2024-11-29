@@ -29,4 +29,6 @@ public class MessageDTO {
 
     private Long receiverId;  // For one-to-one messages
 
+    private Long tempId;
+
 }

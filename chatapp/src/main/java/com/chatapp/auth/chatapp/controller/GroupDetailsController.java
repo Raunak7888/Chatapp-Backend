@@ -2,6 +2,7 @@ package com.chatapp.auth.chatapp.controller;
 
 import com.chatapp.auth.chatapp.DTO.CreateGroupDTO;
 import com.chatapp.auth.chatapp.DTO.GroupDTO;
+import com.chatapp.auth.chatapp.DTO.MessageAcknowledgmentDTO;
 import com.chatapp.auth.model.Group;
 import com.chatapp.auth.model.GroupDetails;
 import com.chatapp.auth.chatapp.service.GroupDetailsService;
@@ -60,6 +61,12 @@ public class GroupDetailsController {
             messagingTemplate.convertAndSend("/topic/group/" + groupDTO.getGroupId(), groupDTO);
 
             logger.info("Message successfully sent to group: {}", groupDTO.getGroupId());
+
+            String senderAcknowledgmentDestination = "/topic/group/" + groupDTO.getSenderId() + "/ack";
+            MessageAcknowledgmentDTO acknowledgment = new MessageAcknowledgmentDTO(
+                    groupDTO.getTempId(), "sent");
+            logger.info("Sending acknowledgment to sender: {}", senderAcknowledgmentDestination);
+            messagingTemplate.convertAndSend(senderAcknowledgmentDestination, acknowledgment);
         } catch (Exception e) {
             logger.error("Error sending message: {}", e.getMessage());
             throw new RuntimeException("Error processing the message.");

@@ -1,5 +1,6 @@
 package com.chatapp.auth.chatapp.controller;
 
+import com.chatapp.auth.chatapp.DTO.MessageAcknowledgmentDTO;
 import com.chatapp.auth.chatapp.DTO.MessageDTO;
 import com.chatapp.auth.chatapp.service.GetUserDataService;
 import com.chatapp.auth.chatapp.service.MessageService;
@@ -29,7 +30,8 @@ public class ChatController {
     @MessageMapping("/send/message")
     public void sendMessage(MessageDTO messageDTO) {
         // Log incoming message content and receiver ID for tracking
-        logger.info("Received message: '{}' from sender ID: {} to receiver ID: {}", messageDTO.getContent(), messageDTO.getSenderId(), messageDTO.getReceiverId());
+        logger.info("Received message: '{}' from sender ID: {} to receiver ID: {}",
+                messageDTO.getContent(), messageDTO.getSenderId(), messageDTO.getReceiverId());
 
         try {
             // Save the message to the database
@@ -38,14 +40,31 @@ public class ChatController {
             // Log the saved message content
             logger.info("Message successfully saved: {}", savedMessage.getContent());
 
+            // Notify the receiver
             String destination = "/topic/user/" + messageDTO.getReceiverId() + "/queue/private";
-            System.out.println(destination);
+            logger.info("Sending message to destination: {}", destination);
             messagingTemplate.convertAndSend(destination, convertToDTO(savedMessage));
+
+            // Notify the sender about successful delivery
+            String senderAcknowledgmentDestination = "/topic/user/" + messageDTO.getSenderId() + "/queue/ack";
+            MessageAcknowledgmentDTO acknowledgment = new MessageAcknowledgmentDTO(
+                    messageDTO.getTempId(), "sent");
+            logger.info("Sending acknowledgment to sender: {}", senderAcknowledgmentDestination);
+            messagingTemplate.convertAndSend(senderAcknowledgmentDestination, acknowledgment);
+
         } catch (Exception e) {
             logger.error("Error saving message: {}", e.getMessage());
+
+            // Notify the sender about the failure
+            String senderAcknowledgmentDestination = "/topic/user/" + messageDTO.getSenderId() + "/queue/ack";
+            MessageAcknowledgmentDTO acknowledgment = new MessageAcknowledgmentDTO(
+                    messageDTO.getTempId(), "failed");
+            messagingTemplate.convertAndSend(senderAcknowledgmentDestination, acknowledgment);
+
             throw new RuntimeException("Message could not be saved due to an error.");
         }
     }
+
 
 
     /**
