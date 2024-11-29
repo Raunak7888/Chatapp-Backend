@@ -23,4 +23,9 @@ public class GroupDTO {
 
     @NotNull(message = "Group ID cannot be null")
     private Long groupId;
+
+    public GroupDTO(Long id, String groupName) {
+        this.groupId = id;
+        this.content = groupName;
+    }
 }

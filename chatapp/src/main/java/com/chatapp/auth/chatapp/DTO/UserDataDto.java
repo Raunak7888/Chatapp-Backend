@@ -4,15 +4,17 @@ import lombok.Data;
 
 @Data
 public class UserDataDto {
-    private Long userId;
-    private String username;
+    private Long id;
+    private String name;
+    private boolean isGroup;
 
     // Constructors
     public UserDataDto() {}
 
-    public UserDataDto(Long userId, String username) {
-        this.userId = userId;
-        this.username = username;
+    public UserDataDto(Long id, String name, boolean isGroup) {
+        this.id = id;
+        this.name = name;
+        this.isGroup = isGroup;
     }
 
 }

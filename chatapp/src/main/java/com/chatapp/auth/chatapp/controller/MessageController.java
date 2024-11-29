@@ -1,6 +1,7 @@
 package com.chatapp.auth.chatapp.controller;
 
 import com.chatapp.auth.chatapp.service.MessageService;
+import com.chatapp.auth.model.Group;
 import com.chatapp.auth.model.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,25 +20,34 @@ public class MessageController {
 
     // Endpoint to get messages between two users
     @GetMapping("/user")
-    public ResponseEntity<List<Message>> getMessagesBetweenUsers(
+    public ResponseEntity<?> getMessagesBetweenUsers(
             @RequestParam Long senderId,
-            @RequestParam Long receiverId) {
+            @RequestParam Long receiverId,
+            @RequestParam boolean isGroup
+    ) {
         try {
             // Define the range: from yesterday's start to the current time
             LocalDateTime startDateTime = LocalDateTime.now().minusDays(1).toLocalDate().atStartOfDay();
             LocalDateTime endDateTime = LocalDateTime.now();
 
             System.out.println("Getting messages between user " + senderId + " and user " + receiverId +
-                    " from " + startDateTime + " to " + endDateTime);
+                    " from " + startDateTime + " to " + endDateTime + ", isGroup: " + isGroup);
 
-            // Fetch messages from service
-            List<Message> messages = messageService.getMessagesBetweenUsers(senderId, receiverId, startDateTime, endDateTime);
-            return ResponseEntity.ok(messages);
-
+            if (isGroup) {
+                // Fetch group messages
+                List<Group> groupMessages = messageService.getGroupsMessages(receiverId, startDateTime, endDateTime);
+                return ResponseEntity.ok(groupMessages);
+            } else {
+                // Fetch direct messages
+                List<Message> userMessages = messageService.getMessagesBetweenUsers(senderId, receiverId, startDateTime, endDateTime);
+                return ResponseEntity.ok(userMessages);
+            }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            System.out.println(e.getMessage()); // Optional: Log the error for debugging
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while fetching messages.");
         }
     }
+
 
 
 

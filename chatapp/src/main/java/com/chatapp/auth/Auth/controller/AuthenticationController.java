@@ -122,11 +122,18 @@ public class AuthenticationController {
     }
 
     // src/main/java/com/example/controller/UserController.java
+//    @GetMapping("/Data/Search")
+//    public List<Object> searchUsers(@RequestParam String query) {
+//        System.out.println(query);
+//        return getUserDataService.searchUsers(query);
+//    }
+
     @GetMapping("/Data/Search")
-    public List<UserDataDto> searchUsers(@RequestParam String query) {
-        System.out.println(query);
-        return getUserDataService.searchUsers(query);
+    public List<Object> searchUsersAndGroups(@RequestParam String query) {
+        System.out.println("Search query: " + query);
+        return getUserDataService.searchUsersAndGroups(query);
     }
+
 
     @GetMapping("/api/user")
     public String getCurrentUserId(@RequestParam(value = "authorizationHeader", required = false) String authorizationHeader) {

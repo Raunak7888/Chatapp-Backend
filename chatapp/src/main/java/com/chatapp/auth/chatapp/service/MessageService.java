@@ -1,8 +1,10 @@
 package com.chatapp.auth.chatapp.service;
 
 import com.chatapp.auth.chatapp.DTO.MessageDTO;
+import com.chatapp.auth.model.Group;
 import com.chatapp.auth.model.Message;
 import com.chatapp.auth.model.User;
+import com.chatapp.auth.repository.GroupRepository;
 import com.chatapp.auth.repository.MessageRepository;
 import com.chatapp.auth.repository.UserRepository;
 import org.slf4j.Logger;
@@ -19,11 +21,13 @@ import java.util.Optional;
 public class MessageService {
     @Autowired
     private final MessageRepository messageRepository;
+    private final GroupRepository groupRepository;
     private final UserRepository userRepository;
     private static final Logger logger = LoggerFactory.getLogger(MessageService.class);
 
-    public MessageService(MessageRepository messageRepository, UserRepository userRepository) {
+    public MessageService(MessageRepository messageRepository, GroupRepository groupRepository, UserRepository userRepository) {
         this.messageRepository = messageRepository;
+        this.groupRepository = groupRepository;
         this.userRepository = userRepository;
     }
 
@@ -83,6 +87,10 @@ public class MessageService {
 
     public List<Message> getMessagesBetweenUsers(Long senderId, Long receiverId, LocalDateTime startDateTime, LocalDateTime endDateTime) {
         return messageRepository.findMessagesBetweenUsers(senderId, receiverId, startDateTime, endDateTime);
+    }
+
+    public List<Group> getGroupsMessages(Long groupId, LocalDateTime startDateTime, LocalDateTime endDateTime){
+        return groupRepository.findByGroupIdIdAndTimestampBetween(groupId, startDateTime, endDateTime);
     }
 
 }

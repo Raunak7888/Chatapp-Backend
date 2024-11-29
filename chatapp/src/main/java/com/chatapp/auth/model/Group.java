@@ -1,5 +1,6 @@
 package com.chatapp.auth.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,6 +29,7 @@ public class Group {
 
     @ManyToOne
     @JoinColumn(name = "group_id", nullable = false) // Foreign key to Groups table
+    @JsonIgnore // Prevents serialization
     private GroupDetails groupId; // Reference to the group
 
     public Group(String content, GroupDetails groupId, Long senderId) {

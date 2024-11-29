@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface GetUserDataService {
         UserDataDto getUserData(Long userId);
-        List<UserDataDto> searchUsers(String query);
+        List<Object> searchUsersAndGroups(String query);
 }
